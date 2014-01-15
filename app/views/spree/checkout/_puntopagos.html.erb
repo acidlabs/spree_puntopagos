@@ -1,0 +1,18 @@
+<div class="panel panel-default" id="payment" data-hook>
+  <div class="panel-heading">
+    <h3 class="panel-title"><%= Spree.t(:payment_information) %></h3>
+  </div>
+  <div class="panel-body" data-hook="checkout_payment_step">
+    <p>
+      An error has occurred, please try again or later
+    </p>
+    <% unless Rails.env.production? %>
+      <span><%= @error %></span>
+    <% end %>
+  </div>
+</div>
+
+<div class="well text-right form-buttons" data-hook="buttons">
+  <%= link_to Spree.t(:save_and_continue), checkout_state_path(@order.state), :class => 'continue button primary' %>
+  <script>Spree.disableSaveOnClick();</script>
+</div>
