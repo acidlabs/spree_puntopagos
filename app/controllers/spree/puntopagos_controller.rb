@@ -12,6 +12,7 @@ module Spree
       # This methods requires the headers as a hash and the params object as a hash
       if notification.valid? headers, params
         if params[:respuesta] == "00"
+          # TODO - aca se debe indicar que la orden ya se pago
           @order.update_attributes puntopagos: params, state: 'complete'
         else
           @order.update_attributes puntopagos: params
@@ -28,9 +29,6 @@ module Spree
 
       @payment = Spree::Payment.find_by_token(params[:token])
       @order   = @payment.order
-
-          # @order.state = 'complete'
-          # @order.save
     end
 
     # GET spree/puntopagos/error

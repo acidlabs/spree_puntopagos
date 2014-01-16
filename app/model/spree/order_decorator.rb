@@ -18,6 +18,7 @@ module Spree
               .payment_method
     end
 
+    # TODO - esto debe ser una columna en la tabla
     def puntopagos_paid?
       true
     end
