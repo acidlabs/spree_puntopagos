@@ -1,10 +1,10 @@
 Spree::Core::Engine.routes.draw do
-  # La URL de notificación
+  # The notification URL
   post 'spree/puntopagos/confirmation', to: 'puntopagos#confirmation'
 
-  # La URL de exito
+  # The success URL
   get 'spree/puntopagos/success', to: 'puntopagos#success'
 
-  # La URL de fracaso
+  # The failure URL
   get 'spree/puntopagos/error', to: 'puntopagos#error'
 end
