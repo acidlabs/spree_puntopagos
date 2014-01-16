@@ -2,6 +2,7 @@ module Spree
   CheckoutController.class_eval do
     def edit
       if params[:state] == Spree::Gateway::Puntopagos::STATE and @order.state == Spree::Gateway::Puntopagos::STATE
+        @payment           = @order.payments.order(:id).last
         payment_method     = @order.payment_method
 
         trx_id             = @order.id.to_s
@@ -20,7 +21,9 @@ module Spree
         resp = req.create trx_id, amount, api_payment_method
 
         if resp.success?
+          @payment.update_attributes token: resp.get_token
           redirect_to resp.payment_process_url
+
           return
         else
           @error = resp.get_error

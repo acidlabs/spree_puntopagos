@@ -17,5 +17,9 @@ module Spree
               .last
               .payment_method
     end
+
+    def puntopagos_paid?
+      true
+    end
   end
 end
