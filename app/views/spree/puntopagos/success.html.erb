@@ -1,18 +1,20 @@
+<% order = @payment.order %>
+
 <div id="checkout" data-hook>
-  <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @order } %>
+  <%= render :partial => 'spree/shared/error_messages', :locals => { :target => order } %>
 
   <div class="row" data-hook="checkout_header">
     <h1 class="columns three alpha" data-hook="checkout_title"><%= Spree.t(:checkout) %></h1>
-    <div class="columns thirteen omega" data-hook="checkout_progress"><%= checkout_progress %></div>
+    <div class="columns thirteen omega" data-hook="checkout_progress"><%= checkout_progress_with_puntopagos(order) %></div>
   </div>
 
   <div class="row" data-hook="checkout_content">
     <div class="columns alpha twelve" data-hook="puntopagos_field_wrapper">
-      <%= form_for @order, :url => update_checkout_path(@order.state), :html => { :id => "checkout_form_#{@order.state}" } do |form| %>
+      <%= form_for order, :url => update_checkout_path(order.state), :html => { :id => "checkout_form_#{order.state}" } do |form| %>
         <fieldset id="billing" data-hook>
           <legend align="center">Payment Information</legend>
 
-          <% if @order.puntopagos_paid? %>
+          <% if order.completed? %>
             <h1>Payment successfully completed</h1>
 
             <p>We have already registered the payment of your order.</p>
@@ -28,7 +30,7 @@
 
           <p>
             <strong>
-              <%= @order.token %>
+              <%= @payment.token %>
             </strong>
           </p>
         </fieldset>
@@ -42,9 +44,9 @@
       <% end %>
     </div>
 
-    <% if @order.state != 'confirm' %>
+    <% if order.state != 'confirm' %>
       <div id="checkout-summary" data-hook="checkout_summary_box" class="columns omega four">
-        <%= render :partial => 'spree/checkout/summary', :locals => { :order => @order } %>
+        <%= render :partial => 'spree/checkout/summary', :locals => { :order => order } %>
       </div>
     <% end %>
   </div>

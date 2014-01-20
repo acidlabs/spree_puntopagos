@@ -3,7 +3,7 @@
 
   <div class="row" data-hook="checkout_header">
     <h1 class="columns three alpha" data-hook="checkout_title"><%= Spree.t(:checkout) %></h1>
-    <div class="columns thirteen omega" data-hook="checkout_progress"></div>
+    <div class="columns thirteen omega" data-hook="checkout_progress"><%= checkout_progress %></div>
   </div>
 
   <div class="row" data-hook="checkout_content">
@@ -27,7 +27,7 @@
         <hr class="clear" />
 
         <div class="form-buttons" data-hook="buttons">
-          <%= link_to 'Previous', checkout_state_path('payment'), :class => 'continue button primary' %>
+          <%= link_to Spree.t(:previous), checkout_state_path('payment'), :class => 'continue button primary' %>
           <script>Spree.disableSaveOnClick();</script>
         </div>
     </div>

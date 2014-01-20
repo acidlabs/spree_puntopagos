@@ -1,6 +1,7 @@
 module Spree
   class PuntopagosController < StoreController
     skip_before_filter :verify_authenticity_token
+    helper 'spree/checkout'
 
     # POST spree/puntopagos/confirmation
     def confirmation
@@ -10,13 +11,13 @@ module Spree
       notification = ::PuntoPagos::Notification.new
 
       # This methods requires the headers as a hash and the params object as a hash
-      if notification.valid? headers, params
-        if params[:respuesta] == "00"
-          # TODO - aca se debe indicar que la orden ya se pago
-          @order.update_attributes puntopagos: params, state: 'complete'
-        else
-          @order.update_attributes puntopagos: params
-        end
+      if Rails.env.development? or notification.valid?(headers, params)
+        @payment.update_attributes puntopagos_params: params
+        # @order.capture
+        # @order.capture(@payment)
+        # @payment.capture
+        @payment.capture!
+        # @payment.payment_method.capture
       end
 
       render nothing: true
@@ -24,20 +25,20 @@ module Spree
 
     # GET spree/puntopagos/success
     def success
-      # TODO - Solo si se requiere desde alguna configuración
-      redirect_to protocol: "http://" and return if request.ssl?
+      @payment        = Spree::Payment.find_by_token(params[:token])
+      @payment_method = @payment.payment_method
+      @order          = @payment.order
 
-      @payment = Spree::Payment.find_by_token(params[:token])
-      @order   = @payment.order
+      # To clean the Cart
+      session[:order_id] = nil
+      @current_order     = nil
     end
 
     # GET spree/puntopagos/error
     def error
-      # TODO - Solo si se requiere desde alguna configuración
-      redirect_to protocol: "http://" and return if request.ssl?
-
-      @payment = Spree::Payment.find_by_token(params[:token])
-      @order   = @payment.order
+      @payment        = Spree::Payment.find_by_token(params[:token])
+      @payment_method = @payment.payment_method
+      @order          = @payment.order
     end
   end
 end
