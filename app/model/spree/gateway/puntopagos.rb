@@ -1,17 +1,32 @@
 module Spree
   # Gateway for Puntopagos Hosted Payment Pages solution
   class Gateway::Puntopagos < Gateway
-    preference :api_environment,    :string
+    preference :api_environment,    :string, default: 'sandbox'
     preference :api_key,            :string
     preference :api_sercret,        :string
     preference :api_payment_method, :string
 
     STATE = 'puntopagos'
 
-    # # Indicates whether its possible to void the payment.
-    # def can_void?(payment)
-    #   !payment.void?
-    # end
+    def payment_profiles_supported?
+      true
+    end
+    def source_required?
+      false
+    end
+
+    def provider_class
+      ::PuntoPagos::Request
+    end
+
+    def provider
+      ::PuntoPagos::Config.env      = has_preference?(:api_environment) ? preferred_api_environment : 'sandbox'
+      ::PuntoPagos::Config.key      = has_preference?(:api_key)         ? preferred_api_key         : nil
+      ::PuntoPagos::Config.secret   = has_preference?(:api_sercret)     ? preferred_api_sercret     : nil
+
+      provider_class
+    end
+
 
     def actions
       %w{capture}
@@ -23,7 +38,6 @@ module Spree
     end
 
     def capture(money_cents, response_code, gateway_options)
-      raise
       gateway_order_id   = gateway_options[:order_id]
       order_number       = gateway_order_id.split('-').first
       payment_identifier = gateway_order_id.split('-').last
@@ -32,32 +46,24 @@ module Spree
       order   = payment.order
 
       if payment.puntopagos_params?
-        if payment.puntopagos_params[:respuesta] == "00"
+        if payment.puntopagos_params["respuesta"] == "00"
           ActiveMerchant::Billing::Response.new(true,  make_success_message(payment.puntopagos_params), {}, {})
         else
-          ActiveMerchant::Billing::Response.new(false, "", {}, {})
+          ActiveMerchant::Billing::Response.new(false, make_failure_message(payment.puntopagos_params), {}, {})
         end
       else
         status = ::PuntoPagos::Status.new
-        status.check payment.token, order.id.to_s, "#{order.total.to_i}.00"
+        status.check(payment.token, order.id.to_s, order.puntopagos_amount)
 
         if status.valid?
-          ActiveMerchant::Billing::Response.new(true,  "Puntopagos paid using PuntoPagos::Status", {}, {})
+          ActiveMerchant::Billing::Response.new(true,  "Puntopagos paid, checked using PuntoPagos::Status class", {}, {})
         else
           ActiveMerchant::Billing::Response.new(false, status.error, {}, {})
         end
       end
     end
 
-    def payment_profiles_supported?
-      false
-    end
-
     def auto_capture?
-      false
-    end
-
-    def source_required?
       false
     end
 

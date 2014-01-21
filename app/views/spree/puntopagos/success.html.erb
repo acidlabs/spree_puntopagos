@@ -14,7 +14,7 @@
         <fieldset id="billing" data-hook>
           <legend align="center">Payment Information</legend>
 
-          <% if order.completed? %>
+          <% if @payment.completed? %>
             <h1>Payment successfully completed</h1>
 
             <p>We have already registered the payment of your order.</p>

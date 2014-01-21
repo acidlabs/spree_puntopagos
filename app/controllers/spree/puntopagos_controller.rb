@@ -13,11 +13,7 @@ module Spree
       # This methods requires the headers as a hash and the params object as a hash
       if Rails.env.development? or notification.valid?(headers, params)
         @payment.update_attributes puntopagos_params: params
-        # @order.capture
-        # @order.capture(@payment)
-        # @payment.capture
         @payment.capture!
-        # @payment.payment_method.capture
       end
 
       render nothing: true
