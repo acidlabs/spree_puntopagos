@@ -1,14 +1,5 @@
 module Spree
   CheckoutController.class_eval do
-    # alias_method :orig_update, :update
-    # def update
-    #   if params[:state] == Spree::Gateway::Puntopagos::STATE and @order.state == Spree::Gateway::Puntopagos::STATE
-    #     raise
-    #   else
-    #     orig_update
-    #   end
-    # end
-
     def edit
       if params[:state] == Spree::Gateway::Puntopagos::STATE and @order.state == Spree::Gateway::Puntopagos::STATE
         @payment           = @order.payments.order(:id).last
