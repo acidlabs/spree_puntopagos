@@ -9,14 +9,15 @@ module Spree
     STATE = 'puntopagos'
 
     def payment_profiles_supported?
-      true
+      false
     end
+
     def source_required?
       false
     end
 
     def provider_class
-      ::PuntoPagos::Request
+      PuntoPagos::Api
     end
 
     def provider
@@ -26,7 +27,6 @@ module Spree
 
       provider_class
     end
-
 
     def actions
       %w{capture}
@@ -52,8 +52,7 @@ module Spree
           ActiveMerchant::Billing::Response.new(false, make_failure_message(payment.puntopagos_params), {}, {})
         end
       else
-        status = ::PuntoPagos::Status.new
-        status.check(payment.token, order.id.to_s, order.puntopagos_amount)
+        status = provider.check_status(payment.token, order.id.to_s, order.puntopagos_amount)
 
         if status.valid?
           ActiveMerchant::Billing::Response.new(true,  "Puntopagos paid, checked using PuntoPagos::Status class", {}, {})
