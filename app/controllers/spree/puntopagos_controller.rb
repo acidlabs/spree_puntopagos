@@ -14,7 +14,11 @@ module Spree
       # This methods requires the headers as a hash and the params object as a hash
       if provider.valid_notification?(headers, params)
         @payment.update_attributes puntopagos_params: params
-        @payment.capture!
+        begin
+          @payment.capture!
+        rescue Core::GatewayError => error
+          Rails.logger.error error
+        end
       end
 
       render nothing: true
@@ -57,7 +61,7 @@ module Spree
         @payment_method = @payment.payment_method
         @order          = @payment.order
       end
-      
+
       def ensure_order_not_completed
         redirect_to spree.cart_path if @order.completed?
       end
