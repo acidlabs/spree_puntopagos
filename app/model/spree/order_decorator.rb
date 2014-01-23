@@ -1,10 +1,11 @@
 module Spree
   Order.class_eval do
+    # Se re-define cuales son pagos pendientes
     def pending_payments
       payments.select{ |payment| payment.checkout? or payment.completed? }
     end
 
-    # insert_checkout_step :puntopagos, after: :payment, if: ->(order) { order.has_puntopagos_payment_method? }
+    # Se re-define el checkout flow
     checkout_flow do
       go_to_state :address
       go_to_state :delivery
@@ -15,6 +16,9 @@ module Spree
       remove_transition from: :delivery, to: :confirm
     end
 
+    # Indica si la orden tiene algun pago con Puntopagos completado con exito
+    #
+    # Return TrueClass||FalseClass instance
     def puntopagos_payment_completed?
       if payments.completed.from_puntopagos.any?
         true
@@ -23,18 +27,23 @@ module Spree
       end
     end
 
+    # Indica si la orden tiene asociado un pago por Puntopagos
+    #
+    # Return TrueClass||FalseClass instance
     def has_puntopagos_payment_method?
       payments.from_puntopagos.any?
     end
 
+    # Devuelvela forma de pago asociada a la order, se extrae desde el ultimo payment
+    #
+    # Return Spree::PaymentMethod||NilClass instance
     def payment_method
-      # TODO - revisar si puedo devolver una nueva intancia de Spree::Gateway::Puntopagos
-      payments.from_puntopagos
-              .order(:id)
-              .last
-              .payment_method
+      has_puntopagos_payment_method? ? payments.from_puntopagos.order(:id).last.payment_method : nil
     end
 
+    # Entrega en valor total en un formato compatible con el estandar de Puntopagos
+    #
+    # Return String instance
     def puntopagos_amount
       # TODO - Ver que pasa cuando hay decimales
       "#{total.to_i}.00"

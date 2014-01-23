@@ -16,10 +16,10 @@ module PuntoPagos
       @@secret = new_secret
     end
 
-    def initialize env = nil, config_override = nil
+    def initialize env = nil
       @puntopagos_base_url = ::PuntoPagos::Config::PUNTOPAGOS_BASE_URL[@@env]
-      @puntopagos_key = @@key
-      @puntopagos_secret = @@secret
+      @puntopagos_key      = @@key
+      @puntopagos_secret   = @@secret
     end
   end
 end
