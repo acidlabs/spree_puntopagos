@@ -1,3 +1,7 @@
 /*
  *= require admin/spree_backend
 */
+
+.state.puntopagos:before {
+  background-color: #ff9300;
+}
