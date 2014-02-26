@@ -39,7 +39,9 @@ Simply add this require statement to your spec_helper:
 require 'spree_puntopagos/factories'
 ```
 
-Copyright (c) 2014 Acidlabs, released under the New BSD License
+Copyright (c) 2014 [Acid Labs][acidlabs], released under the New BSD License
+
+[acidlabs]: https://github.com/acidlabs
 
 
 Contributing
