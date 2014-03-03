@@ -15,4 +15,4 @@ es:
     puntopagos_thanks: Gracias por su preferencia
     puntopagos_payment_registered: Ya hemos registrado el pago de su pedido.
     puntopagos_awaiting_confirmation: Estamos esperando la confirmación del pago de su pedido.
-    puntopagos_captured: "Puntopagos paid, checked using PuntoPagos::Status class"
+    puntopagos_captured: "Pago capturado manualmente"

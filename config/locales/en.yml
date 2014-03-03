@@ -15,3 +15,4 @@ en:
     puntopagos_thanks: Thanks you for your preference
     puntopagos_payment_registered: We have already registered the payment of your order.
     puntopagos_awaiting_confirmation: We are awaiting confirmation of payment of your order.
+    puntopagos_captured: "Payment captured manually"
