@@ -6,7 +6,9 @@ module Spree
     preference :api_sercret,        :string
     preference :api_payment_method, :string
 
-    STATE = 'puntopagos'
+    def self.STATE
+      'puntopagos'
+    end
 
     def payment_profiles_supported?
       false
