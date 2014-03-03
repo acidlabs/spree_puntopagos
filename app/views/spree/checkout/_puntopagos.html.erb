@@ -4,7 +4,7 @@
   </div>
   <div class="panel-body" data-hook="checkout_payment_step">
     <p>
-      An error has occurred, please try again or later
+      <%= Spree.t(:puntopagos_try_again_or_later) %>
     </p>
     <% unless Rails.env.production? %>
       <span><%= @error %></span>

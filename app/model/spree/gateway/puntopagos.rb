@@ -57,7 +57,7 @@ module Spree
         status = provider.check_status(payment.token, order.id.to_s, order.puntopagos_amount)
 
         if status.valid?
-          ActiveMerchant::Billing::Response.new(true,  "Puntopagos paid, checked using PuntoPagos::Status class", {}, {})
+          ActiveMerchant::Billing::Response.new(true, Spree.t(:puntopagos_captured), {}, {})
         else
           ActiveMerchant::Billing::Response.new(false, status.error, {}, {})
         end

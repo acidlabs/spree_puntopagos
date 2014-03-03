@@ -12,21 +12,21 @@
     <div class="columns alpha twelve" data-hook="puntopagos_field_wrapper">
       <%= form_for order, :url => update_checkout_path(order.state), :html => { :id => "checkout_form_#{order.state}" } do |form| %>
         <fieldset id="billing" data-hook>
-          <legend align="center">Payment Information</legend>
+          <legend align="center"><%= Spree.t(:payment_information) %></legend>
 
           <% if @payment.completed? %>
-            <h1>Payment successfully completed</h1>
+            <h1><%= Spree.t(:puntopagos_payment_successfully_completed) %></h1>
 
-            <p>We have already registered the payment of your order.</p>
-            <p>Thanks you for your preference</p>
+            <p><%= Spree.t(:puntopagos_payment_registered) %></p>
+            <p><%= Spree.t(:puntopagos_thanks) %></p>
 
           <% else %>
-            <h1>Payment process completed</h1>
+            <h1><%= Spree.t(:puntopagos_payment_process_completed) %></h1>
 
-            <p>We are awaiting confirmation of payment of your order.</p>
+            <p><%= Spree.t(:puntopagos_awaiting_confirmation) %></p>
           <% end %>
 
-          <h2>Purchase code</h2>
+          <h2><%= Spree.t(:purchase_code) %></h2>
 
           <p>
             <strong>

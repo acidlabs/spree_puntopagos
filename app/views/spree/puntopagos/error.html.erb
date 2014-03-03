@@ -9,13 +9,13 @@
   <div class="row" data-hook="checkout_content">
     <div class="columns alpha twelve" data-hook="puntopagos_field_wrapper">
         <fieldset id="billing" data-hook>
-          <legend align="center">Payment Information</legend>
+          <legend align="center"><%= Spree.t(:payment_information) %></legend>
 
-          <h1>Payment is not completed</h1>
+          <h1><%= Spree.t(:puntopagos_payment_incompleted) %></h1>
 
-          <p>Errors were found, please try again using different payment methods.</p>
+          <p><%= Spree.t(:puntopagos_payment_with_errors) %></p>
 
-          <h2>Purchase code</h2>
+          <h2><%= Spree.t(:puntopagos_code) %></h2>
 
           <p>
             <strong>
