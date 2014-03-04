@@ -33,7 +33,7 @@ module PuntoPagos
       # TODO - Verificar que la configuracion este disponible y seteada correctamente
       puntopagos_notification = ::PuntoPagos::Notification.new
 
-      if Rails.env.development? or puntopagos_notification.valid?(headers.to_hash, params.to_hash)
+      if Rails.env.development? or puntopagos_notification.valid?(headers, params.to_hash)
         true
       else
         false
