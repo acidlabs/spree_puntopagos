@@ -12,7 +12,7 @@ module Spree
       provider = @payment_method.provider.new
 
       # This methods requires the headers as a hash and the params object as a hash
-      if provider.valid_notification?(headers, params)
+      if provider.valid_notification?(request.headers, params)
         @payment.update_attributes puntopagos_params: params
         begin
           @payment.capture!
