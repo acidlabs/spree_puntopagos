@@ -14,8 +14,8 @@ module Spree
       # This methods requires the headers as a hash and the params object as a hash
       if provider.valid_notification?(request.headers, params)
         Rails.logger.info "updating attributes"
-        @payment.update_attributes puntopagos_params: params
-        raise @payment.errors.messages if @payment.errors.any?
+        @payment.update_attributes puntopagos_params: params.to_hash
+        raise "#{@payment.inspect} -- #{@payment.errors.messages}" if @payment.puntopagos_params.nil?
 
         Rails.logger.info "updated attributes"
         # begin
