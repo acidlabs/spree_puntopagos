@@ -6,7 +6,7 @@
       <label>
         <%= radio_button_tag "order[payments_attributes][][payment_method_id]", method.id, method == @order.available_payment_methods.first %>
 
-        <% if logo = method.payment_method_logo %>
+        <% if method.respond_to?(:payment_method_logo) and logo = method.payment_method_logo %>
           <%= image_tag logo %>
         <% else %>
           <%= Spree.t(method.name, :scope => :payment_methods, :default => method.name) %>
