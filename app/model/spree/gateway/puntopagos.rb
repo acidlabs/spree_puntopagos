@@ -10,6 +10,11 @@ module Spree
       'puntopagos'
     end
 
+    # def STATE
+    #   'puntopagos'
+    # end
+    # STATE = 'puntopagos'.freeze
+
     def payment_profiles_supported?
       false
     end
@@ -70,6 +75,14 @@ module Spree
 
     def method_type
       "puntopagos"
+    end
+
+    def payment_method_logo
+      if has_preference?(:api_payment_method) and preferred_api_payment_method.present?
+        "http://www.puntopagos.com/content/mp#{preferred_api_payment_method}.gif"
+      else
+        nil
+      end
     end
 
     private

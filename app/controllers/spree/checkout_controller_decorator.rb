@@ -7,7 +7,7 @@ module Spree
 
       redirect_to puntopagos_error_path(@payment.token) and return if @payment and @payment.token? and @payment.failed? and params[:state] != 'payment'
 
-      if params[:state] == Spree::Gateway::Puntopagos::STATE and @order.state == Spree::Gateway::Puntopagos::STATE
+      if params[:state] == Spree::Gateway::Puntopagos.STATE and @order.state == Spree::Gateway::Puntopagos.STATE
         payment_method     = @order.payment_method
 
         trx_id             = @order.id.to_s
