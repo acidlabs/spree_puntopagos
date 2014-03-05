@@ -28,7 +28,7 @@ module PuntoPagos
       puntopagos_status
     end
 
-    # Return TrueClass||FalseClass instance
+    # Return an Array with response and a message. [TrueClass||FalseClass, String]
     def valid_notification?(headers, params)
       # TODO - Verificar que la configuracion este disponible y seteada correctamente
       puntopagos_notification = ::PuntoPagos::Notification.new
