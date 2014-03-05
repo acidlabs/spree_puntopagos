@@ -10,9 +10,10 @@ module Spree
     # POST spree/puntopagos/confirmation
     def confirmation
       provider = @payment_method.provider.new
+      response, message = provider.valid_notification?(request.headers, params)
 
       # This methods requires the headers as a hash and the params object as a hash
-      if provider.valid_notification?(request.headers, params)
+      if response
         @payment.update_attributes puntopagos_params: params.to_hash
 
         begin
@@ -21,7 +22,7 @@ module Spree
           Rails.logger.error error
         end
       else
-        Rails.logger.info "Invalid Notification"
+        Rails.logger.info "Invalid Notification: #{message}"
       end
 
       render nothing: true

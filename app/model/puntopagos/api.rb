@@ -34,9 +34,9 @@ module PuntoPagos
       puntopagos_notification = ::PuntoPagos::Notification.new
 
       if Rails.env.development? or puntopagos_notification.valid?(headers, params.to_hash)
-        true
+        [true, '']
       else
-        false
+        [false, puntopagos_notification.error]
       end
     end
   end
