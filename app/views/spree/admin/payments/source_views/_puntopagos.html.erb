@@ -1,0 +1,31 @@
+<% if payment.respond_to?(:puntopagos_params) and payment.puntopagos_params %>
+  <dl>
+    <% if payment.puntopagos_params['error'] %>
+      <dt>Error:</dt>
+      <dd><%= payment.puntopagos_params['error'] %></dd>
+
+    <% else %>
+      <dt>Monto:</dt>
+      <dd><%= payment.puntopagos_params['monto'] %></dd>
+
+      <dt>token:</dt>
+      <dd><%= payment.puntopagos_params['token'] %></dd>
+
+      <dt>trx_id:</dt>
+      <dd><%= payment.puntopagos_params['trx_id'] %></dd>
+
+
+      <% puntopago = JSON.parse(payment.puntopagos_params['puntopago'].gsub('=>', ':').gsub('nil', '""')) %>
+
+      <dt>Código autorización\:</dt>
+      <dd><%= puntopago['codigo_autorizacion'] %></dd>
+
+      <dt>Fecha aprobación:</dt>
+      <dd><%= puntopago['fecha_aprobacion'] %></dd>
+
+      <dt>Número operación:</dt>
+      <dd><%= puntopago['numero_operacion'] %></dd>
+    <% end %>
+
+  </dl>
+<% end %>
