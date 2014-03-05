@@ -48,9 +48,5 @@ module Spree
       # TODO - Ver que pasa cuando hay decimales
       "#{total.to_i}.00"
     end
-
-    def trx_id
-      number.gsub(/\D/, '')
-    end
   end
 end
