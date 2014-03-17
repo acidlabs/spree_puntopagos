@@ -65,9 +65,11 @@ module Spree
     def error
       # TODO - quiza aca se puede pasar el pago a :failure
 
-      # To restore the Cart
-      session[:order_id] = @order.id
-      @current_order     = @order
+      unless @order.completed?
+        # To restore the Cart
+        session[:order_id] = @order.id
+        @current_order     = @order
+      end
 
       # reviso si el pago esta completo y lo envio a la vista correcta
       redirect_to puntopagos_success_path(@payment.token) and return if ['processing', 'completed'].include?(@payment.state)

@@ -22,6 +22,10 @@ module Spree
           @payment.update_attributes token: response.get_token
           redirect_to response.payment_process_url
 
+          # To clean the Cart
+          session[:order_id] = nil
+          @current_order     = nil
+
           return
         else
           @error = response.get_error
