@@ -30,28 +30,47 @@ module Spree
 
     # GET spree/puntopagos/success
     def success
-      # TODO - quiza aca se puede pasar el pago a :pending
-
-      # reviso si el pago esta fallido y lo envio a la vista correcta
-      if @payment.failed?
-        redirect_to puntopagos_error_path(@payment.token)
-        return
-      end
-
       # To clean the Cart
       session[:order_id] = nil
       @current_order     = nil
+
+      if @payment.failed?
+        # reviso si el pago esta fallido y lo envio a la vista correcta
+        redirect_to puntopagos_error_path(@payment.token)
+        return
+      else
+        # Consulto la API de Puntopagos para ver el estado de la transaccion
+        status = @payment.payment_method.provider.new.check_status(@payment.token, @payment.trx_id.to_s, @order.puntopagos_amount)
+
+        if status.valid?
+          # Order to next state
+          unless @order.next
+            flash[:error] = @order.errors.full_messages.join("\n")
+            redirect_to checkout_state_path(@order.state) and return
+          end
+
+          if @order.completed?
+            flash.notice = Spree.t(:order_processed_successfully)
+            redirect_to completion_route and return
+          else
+            redirect_to checkout_state_path(@order.state) and return
+          end
+        else
+          redirect_to puntopagos_error_path(@payment.token) and return
+        end
+      end
     end
 
     # GET spree/puntopagos/error
     def error
-      # TODO - quiza aca se puede pasar el pago a :pending
+      # TODO - quiza aca se puede pasar el pago a :failure
+
+      # To restore the Cart
+      session[:order_id] = @order.id
+      @current_order     = @order
 
       # reviso si el pago esta completo y lo envio a la vista correcta
-      if ['processing', 'completed'].include?(@payment.state)
-        redirect_to puntopagos_success_path(@payment.token)
-        return
-      end
+      redirect_to puntopagos_success_path(@payment.token) and return if ['processing', 'completed'].include?(@payment.state)
     end
 
     private
@@ -66,8 +85,15 @@ module Spree
         @order          = @payment.order
       end
 
+
+      # Same as CheckoutController#ensure_order_not_completed
       def ensure_order_not_completed
         redirect_to spree.cart_path if @order.completed?
+      end
+
+      # Same as CheckoutController#completion_route
+      def completion_route
+        spree.order_path(@order)
       end
   end
 end
