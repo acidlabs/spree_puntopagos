@@ -20,15 +20,20 @@ module Spree
         if response.success?
           # TODO - ver si se puede reutilizar el token cuando este ya esta seteado
           @payment.update_attributes token: response.get_token
-          redirect_to response.payment_process_url
 
           # To clean the Cart
           session[:order_id] = nil
           @current_order     = nil
 
-          return
+          redirect_to response.payment_process_url and return
         else
           @error = response.get_error
+          @payment.update_attributes puntopagos_params: {error: @error}
+
+          unless ['processing', 'failed'].include?(@payment.state)
+            @payment.started_processing!
+            @payment.failure!
+          end
         end
       end
     end

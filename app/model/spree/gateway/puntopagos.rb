@@ -64,6 +64,12 @@ module Spree
         if status.valid?
           ActiveMerchant::Billing::Response.new(true, Spree.t(:puntopagos_captured), {}, {})
         else
+          payment.update_attributes puntopagos_params: {error: status.error}
+          unless ['processing', 'failed'].include?(payment.state)
+            payment.started_processing!
+            payment.failure!
+          end
+
           ActiveMerchant::Billing::Response.new(false, status.error, {}, {})
         end
       end

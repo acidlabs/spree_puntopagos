@@ -19,10 +19,20 @@ module Spree
         begin
           @payment.capture!
         rescue Core::GatewayError => error
-          Rails.logger.error error
+          @payment.update_attributes puntopagos_params: {error: error}
+
+          unless ['processing', 'failed'].include?(@payment.state)
+            @payment.started_processing!
+            @payment.failure!
+          end
         end
       else
-        Rails.logger.info "Invalid Notification: #{message}"
+        @payment.update_attributes puntopagos_params: {error: message}
+
+        unless ['processing', 'failed'].include?(@payment.state)
+          @payment.started_processing!
+          @payment.failure!
+        end
       end
 
       render nothing: true
@@ -43,6 +53,8 @@ module Spree
         status = @payment.payment_method.provider.new.check_status(@payment.token, @payment.trx_id.to_s, @order.puntopagos_amount)
 
         if status.valid?
+          @payment.capture!
+
           # Order to next state
           unless @order.next
             flash[:error] = @order.errors.full_messages.join("\n")
@@ -56,6 +68,13 @@ module Spree
             redirect_to checkout_state_path(@order.state) and return
           end
         else
+          @payment.update_attributes puntopagos_params: {error: status.error}
+
+          unless ['processing', 'failed'].include?(@payment.state)
+            @payment.started_processing!
+            @payment.failure!
+          end
+
           redirect_to puntopagos_error_path(@payment.token) and return
         end
       end
@@ -73,6 +92,11 @@ module Spree
 
       # reviso si el pago esta completo y lo envio a la vista correcta
       redirect_to puntopagos_success_path(@payment.token) and return if ['processing', 'completed'].include?(@payment.state)
+
+      unless ['processing', 'failed'].include?(@payment.state)
+        @payment.started_processing!
+        @payment.failure!
+      end
     end
 
     private
