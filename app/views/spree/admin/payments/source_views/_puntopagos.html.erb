@@ -1,5 +1,14 @@
-<% if payment.respond_to?(:puntopagos_params) and payment.puntopagos_params %>
-  <dl>
+<dl>
+  <dt>token:</dt>
+  <dd><%= payment.token %></dd>
+
+  <dt>trx_id:</dt>
+  <dd><%= payment.trx_id.to_s %></dd>
+
+  <dt><%= Spree.t(:payment_state) %>:</dt>
+  <dd><%= Spree.t(payment.state, :scope => :payment_states, :default => payment.state.capitalize) %></dd>
+
+  <% if payment.respond_to?(:puntopagos_params) and payment.puntopagos_params %>
     <% if payment.puntopagos_params['error'] %>
       <dt>Error:</dt>
       <dd><%= payment.puntopagos_params['error'] %></dd>
@@ -7,13 +16,6 @@
     <% else %>
       <dt>Monto:</dt>
       <dd><%= payment.puntopagos_params['monto'] %></dd>
-
-      <dt>token:</dt>
-      <dd><%= payment.puntopagos_params['token'] %></dd>
-
-      <dt>trx_id:</dt>
-      <dd><%= payment.puntopagos_params['trx_id'] %></dd>
-
 
       <% puntopago = JSON.parse(payment.puntopagos_params['puntopago'].gsub('=>', ':').gsub('nil', '""')) %>
 
@@ -26,6 +28,5 @@
       <dt>Número operación:</dt>
       <dd><%= puntopago['numero_operacion'] %></dd>
     <% end %>
-
-  </dl>
-<% end %>
+  <% end %>
+</dl>
