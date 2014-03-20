@@ -14,20 +14,23 @@ module Spree
 
       # This methods requires the headers as a hash and the params object as a hash
       if response
-        @payment.update_attributes puntopagos_params: params.to_hash
+        @payment.update_attributes puntopagos_params: params['puntopago'].symbolize_keys
 
         begin
           @payment.capture!
+          @order.next! unless @order.completed?
         rescue Core::GatewayError => error
-          @payment.update_attributes puntopagos_params: {error: error}
+          @payment.update_attributes puntopagos_params: @payment.puntopagos_params.merge({internal_error: error})
 
           unless ['processing', 'failed'].include?(@payment.state)
             @payment.started_processing!
             @payment.failure!
           end
+        rescue => error
+          @payment.update_attributes puntopagos_params: @payment.puntopagos_params.merge({internal_error: error})
         end
       else
-        @payment.update_attributes puntopagos_params: {error: message}
+        @payment.update_attributes puntopagos_params: message['puntopago'].symbolize_keys
 
         unless ['processing', 'failed'].include?(@payment.state)
           @payment.started_processing!

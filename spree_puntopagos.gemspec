@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.name        = 'spree_puntopagos'
   s.version     = SpreePuntopagos::VERSION
   s.summary     = 'Plugs Puntopagos Payment Gateway into Spree Stores'
-  s.description = 'Plugs Puntopagos Payment Gateway into Spree Stores'
+  s.description = 'Easily integrates Puntopagos payments into a Spree store'
   s.required_ruby_version = '>= 1.9.3'
 
   s.author      = 'Marcelo Espina'
@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'sass-rails'
   s.add_development_dependency 'selenium-webdriver'
   s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'sqlite3'
+  s.add_development_dependency 'pg'
 
   # s.add_development_dependency 'puntopagos'
   s.add_runtime_dependency 'puntopagos'

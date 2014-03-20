@@ -79,4 +79,6 @@ RSpec.configure do |config|
   end
 
   config.fail_fast = ENV['FAIL_FAST'] || false
+
+  config.include Spree::TestingSupport::ControllerRequests
 end
