@@ -36,7 +36,7 @@ module Spree
     end
 
     def actions
-      %w{capture}
+      %w{capture credit}
     end
 
     # Indicates whether its possible to capture the payment
@@ -73,6 +73,10 @@ module Spree
           ActiveMerchant::Billing::Response.new(false, status.error, {}, {})
         end
       end
+    end
+
+    def credit(money, credit_card, response_code, options = {})
+      ActiveMerchant::Billing::Response.new(true, '#{Spree::Gateway::Puntopagos.to_s}: Forced success', {}, {})
     end
 
     def auto_capture?
