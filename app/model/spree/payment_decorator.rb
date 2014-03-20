@@ -7,14 +7,14 @@ module Spree
     private
       # Public: Setea un trx_id unico.
       #
-      # Returns Token.
+      # Returns Integer.
       def set_trx_id
         self.trx_id ||= generate_trx_id
       end
 
-      # Public: Genera el trx_id unico.
+      # Public: Genera el trx_id unico y lo retorna.
       #
-      # Returns generated trx_id.
+      # Returns Integer.
       def generate_trx_id
         while true
           generated_trx_id = Time.now.to_i
