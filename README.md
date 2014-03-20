@@ -5,6 +5,18 @@ Easily integrates Puntopagos payments into a Spree store. It works as a wrapper
 of the awesome puntopagos-ruby gem which contains all basic API calls for Puntopagos payment
 services.
 
+
+Dependencies
+------------
+You need to make sure to use Postgres as database engine.
+
+Also need to install the extension for Postgres `hstore`:
+
+```shell
+sudo apt-get install postgresql-contrib
+```
+
+
 Installation
 ------------
 
