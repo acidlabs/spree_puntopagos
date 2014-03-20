@@ -40,7 +40,7 @@ Be sure to bundle your dependencies and then create a dummy test app for the spe
 
 ```shell
 bundle
-bundle exec rake test_app
+DB=postgres bundle exec rake test_app
 bundle exec rspec spec
 ```
 
