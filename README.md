@@ -53,6 +53,8 @@ require 'spree_puntopagos/factories'
 
 Copyright (c) 2014 [Acid Labs][acidlabs], released under the New BSD License
 
+[acidlabs]: https://github.com/acidlabs
+
 
 Contributing
 ------------
