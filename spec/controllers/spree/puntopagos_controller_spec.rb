@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Spree::PuntopagosController do
-  # let(:token) { 'some_token' }
   let(:user) { stub_model(Spree::User) }
 
   before do
@@ -10,6 +9,9 @@ describe Spree::PuntopagosController do
     @payment        = FactoryGirl.create(:puntopagos_payment, token: 'ASDF1234')
     @payment_method = @payment.payment_method
     @order          = @payment.order
+
+    session[:order_id] = @order.id
+    @current_order     = @order
 
     controller.stub :try_spree_current_user => user
     controller.stub :spree_current_user => user
@@ -126,6 +128,22 @@ describe Spree::PuntopagosController do
 
         assigns(:payment).puntopagos_params.should_not be_nil
         assigns(:payment).puntopagos_params.should == @success_params['puntopago'].symbolize_keys
+      end
+
+      it 'should clean :order_id from session' do
+        session[:order_id].should_not be_nil
+
+        post :confirmation, @success_params
+
+        session[:order_id].should be_nil
+      end
+
+      it 'should clean :current_order' do
+        @current_order.should_not be_nil
+
+        post :confirmation, @success_params
+
+        assigns(:current_order).should be_nil
       end
 
       it 'should save internal Spree::Core::GatewayError' do

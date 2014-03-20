@@ -19,6 +19,10 @@ module Spree
         begin
           @payment.capture!
           @order.next! unless @order.completed?
+
+          # To clean the Cart
+          session[:order_id] = nil
+          @current_order     = nil
         rescue Core::GatewayError => error
           @payment.update_attributes puntopagos_params: @payment.puntopagos_params.merge({internal_error: error})
 
