@@ -1,3 +1,3 @@
 module SpreePuntopagos
-  VERSION = '3.7.0'
+  VERSION = '3.7.2'
 end

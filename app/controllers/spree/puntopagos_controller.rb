@@ -5,8 +5,6 @@ module Spree
 
     before_filter :load_data
 
-    before_filter :ensure_order_not_completed
-
     # POST spree/puntopagos/confirmation
     def confirmation
       provider = @payment_method.provider.new
@@ -116,12 +114,6 @@ module Spree
 
         @payment_method = @payment.payment_method
         @order          = @payment.order
-      end
-
-
-      # Same as CheckoutController#ensure_order_not_completed
-      def ensure_order_not_completed
-        redirect_to spree.cart_path if @order.completed?
       end
 
       # Same as CheckoutController#completion_route
