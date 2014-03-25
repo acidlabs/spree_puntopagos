@@ -31,14 +31,14 @@ module Spree
     #
     # Return TrueClass||FalseClass instance
     def has_puntopagos_payment_method?
-      payments.from_puntopagos.any?
+      payments.valid.from_puntopagos.any?
     end
 
-    # Devuelvela forma de pago asociada a la order, se extrae desde el ultimo payment
+    # Devuelve la forma de pago asociada a la order, se extrae desde el ultimo payment
     #
     # Return Spree::PaymentMethod||NilClass instance
     def payment_method
-      has_puntopagos_payment_method? ? payments.from_puntopagos.order(:id).last.payment_method : nil
+      has_puntopagos_payment_method? ? payments.valid.from_puntopagos.order(:id).last.payment_method : nil
     end
 
     # Entrega en valor total en un formato compatible con el estandar de Puntopagos
