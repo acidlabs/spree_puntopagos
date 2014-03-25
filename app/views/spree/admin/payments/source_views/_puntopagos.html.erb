@@ -17,16 +17,14 @@
       <dt>Monto:</dt>
       <dd><%= payment.puntopagos_params['monto'] %></dd>
 
-      <% puntopago = JSON.parse(payment.puntopagos_params['puntopago'].gsub('=>', ':').gsub('nil', '""')) %>
-
       <dt>Código autorización\:</dt>
-      <dd><%= puntopago['codigo_autorizacion'] %></dd>
+      <dd><%= payment.puntopagos_params['codigo_autorizacion'] %></dd>
 
       <dt>Fecha aprobación:</dt>
-      <dd><%= puntopago['fecha_aprobacion'] %></dd>
+      <dd><%= payment.puntopagos_params['fecha_aprobacion'] %></dd>
 
       <dt>Número operación:</dt>
-      <dd><%= puntopago['numero_operacion'] %></dd>
+      <dd><%= payment.puntopagos_params['numero_operacion'] %></dd>
     <% end %>
   <% end %>
 </dl>
