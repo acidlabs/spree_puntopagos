@@ -13,6 +13,8 @@ module Spree
         if params[:state] == Spree::Gateway::Puntopagos.STATE and @order.state == Spree::Gateway::Puntopagos.STATE
           payment_method     = @order.payment_method
 
+          return if payment_method.nil?
+
           trx_id             = @payment.trx_id.to_s
           api_payment_method = payment_method.has_preference?(:api_payment_method) ? payment_method.preferred_api_payment_method : nil
           amount             = @order.puntopagos_amount

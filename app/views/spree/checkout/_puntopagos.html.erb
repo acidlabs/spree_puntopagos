@@ -6,13 +6,16 @@
     <p>
       <%= Spree.t(:puntopagos_try_again_or_later) %>
     </p>
-    <% unless Rails.env.production? %>
-      <span><%= @error %></span>
+
+    <% if @payment.respond_to?(:puntopagos_params) and @payment.puntopagos_params and @payment.puntopagos_params['error'] %>
+      <p>
+        <strong><%= @payment.puntopagos_params['error'] %></strong>
+      </p>
     <% end %>
   </div>
 </div>
 
-<div class="well text-right form-buttons" data-hook="buttons">
-  <%= link_to Spree.t(:save_and_continue), checkout_state_path('payment'), :class => 'continue button primary' %>
+<div class="well form-buttons" data-hook="buttons">
+  <%= link_to Spree.t(:previous), checkout_state_path('payment'), :class => 'continue button primary' %>
   <script>Spree.disableSaveOnClick();</script>
 </div>
