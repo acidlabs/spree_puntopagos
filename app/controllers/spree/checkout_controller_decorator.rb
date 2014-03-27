@@ -33,7 +33,7 @@ module Spree
             redirect_to response.payment_process_url and return
           else
             @error = response.get_error
-            @payment.update_attributes puntopagos_params: {error: @error}
+            @payment.update_attributes puntopagos_params: {'error' => @error}
 
             unless ['processing', 'failed'].include?(@payment.state)
               @payment.started_processing!

@@ -56,6 +56,12 @@ module Spree
         if payment.puntopagos_params["respuesta"] == "00"
           ActiveMerchant::Billing::Response.new(true,  make_success_message(payment.puntopagos_params), {}, {})
         else
+          payment.update_attributes puntopagos_params: {'error' => payment.puntopagos_params["error"]}
+          unless ['processing', 'failed'].include?(payment.state)
+            payment.started_processing!
+            payment.failure!
+          end
+
           ActiveMerchant::Billing::Response.new(false, make_failure_message(payment.puntopagos_params), {}, {})
         end
       else
@@ -64,7 +70,7 @@ module Spree
         if status.valid?
           ActiveMerchant::Billing::Response.new(true, Spree.t(:puntopagos_captured), {}, {})
         else
-          payment.update_attributes puntopagos_params: {error: status.error}
+          payment.update_attributes puntopagos_params: {'error' => status.error}
           unless ['processing', 'failed'].include?(payment.state)
             payment.started_processing!
             payment.failure!
@@ -101,11 +107,11 @@ module Spree
 
     private
     def make_success_message puntopagos_params
-      puntopagos_params[:medio_pago_descripcion]
+      puntopagos_params['medio_pago_descripcion']
     end
 
     def make_failure_message puntopagos_params
-      puntopagos_params[:error]
+      puntopagos_params['error']
     end
   end
 end

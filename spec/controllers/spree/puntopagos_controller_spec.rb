@@ -127,23 +127,7 @@ describe Spree::PuntopagosController do
         post :confirmation, @success_params
 
         assigns(:payment).puntopagos_params.should_not be_nil
-        assigns(:payment).puntopagos_params.should == @success_params['puntopago'].symbolize_keys
-      end
-
-      it 'should clean :order_id from session' do
-        session[:order_id].should_not be_nil
-
-        post :confirmation, @success_params
-
-        session[:order_id].should be_nil
-      end
-
-      it 'should clean :current_order' do
-        @current_order.should_not be_nil
-
-        post :confirmation, @success_params
-
-        assigns(:current_order).should be_nil
+        assigns(:payment).puntopagos_params.should == @success_params['puntopago']
       end
 
       it 'should save internal Spree::Core::GatewayError' do
@@ -153,9 +137,10 @@ describe Spree::PuntopagosController do
         post :confirmation, @success_params
 
         assigns(:payment).puntopagos_params.should_not be_nil
-        assigns(:payment).puntopagos_params[:error].should be_nil
-        assigns(:payment).puntopagos_params[:internal_error].should_not be_nil
-        assigns(:payment).puntopagos_params[:internal_error].should == custom_error
+
+        assigns(:payment).puntopagos_params['error'].should_not be_nil
+        assigns(:payment).puntopagos_params['error'].should == custom_error.to_s
+        assigns(:payment).puntopagos_params['internal_error'].should be_nil
       end
 
       it 'must fail the :payment when internal Spree::Core::GatewayError was raised' do
@@ -176,9 +161,9 @@ describe Spree::PuntopagosController do
         post :confirmation, @success_params
 
         assigns(:payment).puntopagos_params.should_not be_nil
-        assigns(:payment).puntopagos_params[:error].should be_nil
-        assigns(:payment).puntopagos_params[:internal_error].should_not be_nil
-        assigns(:payment).puntopagos_params[:internal_error].should == custom_error
+        assigns(:payment).puntopagos_params['error'].should be_nil
+        assigns(:payment).puntopagos_params['internal_error'].should_not be_nil
+        assigns(:payment).puntopagos_params['internal_error'].should == custom_error.to_s
       end
 
       it 'must complete the :order' do
@@ -219,8 +204,10 @@ describe Spree::PuntopagosController do
         post :confirmation, @failed_params
 
         assigns(:payment).puntopagos_params.should_not be_nil
-        assigns(:payment).puntopagos_params[:error].should_not be_nil
-        assigns(:payment).puntopagos_params.should == @failed_params['puntopago'].symbolize_keys
+        puts assigns(:payment).puntopagos_params.inspect
+        puts @failed_params.inspect
+        assigns(:payment).puntopagos_params['error'].should_not be_nil
+        assigns(:payment).puntopagos_params.should == @failed_params['puntopago']
       end
 
       it 'must fail the :payment' do
@@ -243,6 +230,22 @@ describe Spree::PuntopagosController do
   end
 
   describe 'GET #success' do
+    it 'should clean :order_id from session' do
+      session[:order_id].should_not be_nil
+
+      get :success, token: @payment.token
+
+      session[:order_id].should be_nil
+    end
+
+    it 'should clean :current_order' do
+      @current_order.should_not be_nil
+
+      get :success, token: @payment.token
+
+      assigns(:current_order).should be_nil
+    end
+
     it 'should assigns :payment' do
       get :success, token: @payment.token
 

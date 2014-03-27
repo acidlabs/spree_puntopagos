@@ -10,3 +10,4 @@ es:
     puntopagos_payment_incompleted: El pago no se completó
     puntopagos_payment_with_errors: 'Ha ocurrido un error, inténtalo de nuevo utilizando un métodos de pago diferente.'
     puntopagos_captured: "Pago capturado manualmente"
+    purchase_code: Código de compra

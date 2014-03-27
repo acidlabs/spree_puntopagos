@@ -10,3 +10,4 @@ en:
     puntopagos_payment_incompleted: Payment is not completed
     puntopagos_payment_with_errors: 'Errors were found, please try again using different payment methods.'
     puntopagos_captured: "Payment captured manually"
+    purchase_code: Purchase code

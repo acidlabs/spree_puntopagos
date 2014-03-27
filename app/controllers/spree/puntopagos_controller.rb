@@ -12,11 +12,11 @@ module Spree
 
       # This methods requires the headers as a hash and the params object as a hash
       if response
-        @payment.update_attributes puntopagos_params: params['puntopago'].symbolize_keys
+        @payment.update_attributes puntopagos_params: params['puntopago']
 
         capture_payment
       else
-        @payment.update_attributes puntopagos_params: message['puntopago'].symbolize_keys
+        @payment.update_attributes puntopagos_params: message['puntopago']
 
         unless ['processing', 'failed'].include?(@payment.state)
           @payment.started_processing!
@@ -43,15 +43,19 @@ module Spree
         redirect_to puntopagos_error_path(@payment.token) and return
       end
 
+      # NOTA: Si llego aca significa que logro capturar el payment y cambiar el estado de la orden
+
       if @order.completed?
         # Si ya se completo la orden
         flash.notice = Spree.t(:order_processed_successfully)
         redirect_to completion_route and return
       else
-        # Seteo el falsh con los errores de la orden
+        # Seteo el flash con los errores de la orden
         flash[:error] = @order.errors.full_messages.join("\n") if @order.errors.any?
 
-        # Avanzo al siguiente paso del flujo o la dejo en el estado correto si la orden tiene errores
+        # Avanzo al siguiente paso del flujo
+        # ó
+        # Deja la orden en un paso que se muestren los errores
         redirect_to checkout_state_path(@order.state) and return
       end
     end
@@ -73,11 +77,6 @@ module Spree
       # else
         # En este caso dejo que muestre la vista de error
       end
-
-      unless ['processing', 'failed', 'invalid'].include?(@payment.state)
-        @payment.started_processing!
-        @payment.failure!
-      end
     end
 
     private
@@ -98,6 +97,8 @@ module Spree
       end
 
       def capture_payment
+        return false if ['failed', 'invalid'].include?(@payment.state)
+
         begin
           # Reviso si puedo capturar el payment
           unless ['processing', 'completed'].include?(@payment.state)
@@ -112,7 +113,7 @@ module Spree
           # Se produjo un error al intentar capturar el payment
           data = @payment.puntopagos_params || {}
 
-          @payment.update_attributes puntopagos_params: data.merge({internal_error: error})
+          @payment.update_attributes puntopagos_params: data.merge({'error' => error.to_s})
 
           unless ['processing', 'failed', 'invalid'].include?(@payment.state)
             @payment.started_processing!
@@ -124,7 +125,7 @@ module Spree
           # Se produjo un error de la aplicacion
           data = @payment.puntopagos_params || {}
 
-          @payment.update_attributes puntopagos_params: data.merge({internal_error: error})
+          @payment.update_attributes puntopagos_params: data.merge({'internal_error' => error.to_s})
 
           unless ['processing', 'failed', 'invalid'].include?(@payment.state)
             @payment.started_processing!
