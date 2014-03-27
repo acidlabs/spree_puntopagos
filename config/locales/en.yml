@@ -7,12 +7,6 @@ en:
       puntopagos: puntopagos
     puntopagos_redirect: You'll be redirected to Puntopagos Hosted Payment Page. After completing the payment form you'll be back to the store.
     puntopagos_try_again_or_later: 'An error has occurred, please try again or later'
-    puntopagos_payment_successfully_completed: Payment successfully completed
-    puntopagos_payment_process_completed: Payment process completed
     puntopagos_payment_incompleted: Payment is not completed
-    purchase_code: Purchase code
     puntopagos_payment_with_errors: 'Errors were found, please try again using different payment methods.'
-    puntopagos_thanks: Thanks you for your preference
-    puntopagos_payment_registered: We have already registered the payment of your order.
-    puntopagos_awaiting_confirmation: We are awaiting confirmation of payment of your order.
     puntopagos_captured: "Payment captured manually"
