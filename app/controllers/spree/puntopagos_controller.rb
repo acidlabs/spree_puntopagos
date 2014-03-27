@@ -14,23 +14,7 @@ module Spree
       if response
         @payment.update_attributes puntopagos_params: params['puntopago'].symbolize_keys
 
-        begin
-          @payment.capture!
-          @order.next! unless @order.completed?
-
-          # To clean the Cart
-          session[:order_id] = nil
-          @current_order     = nil
-        rescue Core::GatewayError => error
-          @payment.update_attributes puntopagos_params: @payment.puntopagos_params.merge({internal_error: error})
-
-          unless ['processing', 'failed'].include?(@payment.state)
-            @payment.started_processing!
-            @payment.failure!
-          end
-        rescue => error
-          @payment.update_attributes puntopagos_params: @payment.puntopagos_params.merge({internal_error: error})
-        end
+        capture_payment
       else
         @payment.update_attributes puntopagos_params: message['puntopago'].symbolize_keys
 
@@ -49,56 +33,48 @@ module Spree
       session[:order_id] = nil
       @current_order     = nil
 
-      if @payment.failed?
-        # reviso si el pago esta fallido y lo envio a la vista correcta
-        redirect_to puntopagos_error_path(@payment.token)
-        return
+      if ['failed', 'invalid'].include?(@payment.state)
+        # Reviso si el pago no se completo correctamente
+        redirect_to puntopagos_error_path(@payment.token) and return
+      end
+
+      unless capture_payment
+        # Si no se pudo capturar el payment
+        redirect_to puntopagos_error_path(@payment.token) and return
+      end
+
+      if @order.completed?
+        # Si ya se completo la orden
+        flash.notice = Spree.t(:order_processed_successfully)
+        redirect_to completion_route and return
       else
-        # Consulto la API de Puntopagos para ver el estado de la transaccion
-        status = @payment.payment_method.provider.new.check_status(@payment.token, @payment.trx_id.to_s, @order.puntopagos_amount)
+        # Seteo el falsh con los errores de la orden
+        flash[:error] = @order.errors.full_messages.join("\n") if @order.errors.any?
 
-        if status.valid?
-          @payment.capture!
-
-          # Order to next state
-          unless @order.completed? or @order.next
-            flash[:error] = @order.errors.full_messages.join("\n")
-            redirect_to checkout_state_path(@order.state) and return
-          end
-
-          if @order.completed?
-            flash.notice = Spree.t(:order_processed_successfully)
-            redirect_to completion_route and return
-          else
-            redirect_to checkout_state_path(@order.state) and return
-          end
-        else
-          @payment.update_attributes puntopagos_params: {error: status.error}
-
-          unless ['processing', 'failed'].include?(@payment.state)
-            @payment.started_processing!
-            @payment.failure!
-          end
-
-          redirect_to puntopagos_error_path(@payment.token) and return
-        end
+        # Avanzo al siguiente paso del flujo o la dejo en el estado correto si la orden tiene errores
+        redirect_to checkout_state_path(@order.state) and return
       end
     end
 
     # GET spree/puntopagos/error
     def error
-      # TODO - quiza aca se puede pasar el pago a :failure
-
       unless @order.completed?
         # To restore the Cart
         session[:order_id] = @order.id
         @current_order     = @order
       end
 
-      # reviso si el pago esta completo y lo envio a la vista correcta
-      redirect_to puntopagos_success_path(@payment.token) and return if ['processing', 'completed'].include?(@payment.state)
+      if ['processing', 'completed'].include?(@payment.state) or capture_payment
+        # Reviso si el pago se completo con exito
+        # ó
+        # Si logro capturar el payment
 
-      unless ['processing', 'failed'].include?(@payment.state)
+        redirect_to puntopagos_success_path(@payment.token) and return
+      # else
+        # En este caso dejo que muestre la vista de error
+      end
+
+      unless ['processing', 'failed', 'invalid'].include?(@payment.state)
         @payment.started_processing!
         @payment.failure!
       end
@@ -119,6 +95,44 @@ module Spree
       # Same as CheckoutController#completion_route
       def completion_route
         spree.order_path(@order)
+      end
+
+      def capture_payment
+        begin
+          # Reviso si puedo capturar el payment
+          unless ['processing', 'completed'].include?(@payment.state)
+            @payment.capture!
+          end
+
+          # Envio la orden al siguiente estado
+          @order.next! unless @order.completed?
+
+          return true
+        rescue Core::GatewayError => error
+          # Se produjo un error al intentar capturar el payment
+          data = @payment.puntopagos_params || {}
+
+          @payment.update_attributes puntopagos_params: data.merge({internal_error: error})
+
+          unless ['processing', 'failed', 'invalid'].include?(@payment.state)
+            @payment.started_processing!
+            @payment.failure!
+          end
+
+          return false
+        rescue => error
+          # Se produjo un error de la aplicacion
+          data = @payment.puntopagos_params || {}
+
+          @payment.update_attributes puntopagos_params: data.merge({internal_error: error})
+
+          unless ['processing', 'failed', 'invalid'].include?(@payment.state)
+            @payment.started_processing!
+            @payment.failure!
+          end
+
+          return false
+        end
       end
   end
 end

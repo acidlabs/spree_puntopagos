@@ -16,7 +16,9 @@
           <p><%= Spree.t(:puntopagos_payment_with_errors) %></p>
 
           <% if @payment.respond_to?(:puntopagos_params) and @payment.puntopagos_params and @payment.puntopagos_params['error'] %>
-            <p><%= @payment.puntopagos_params['error'] %></p>
+            <p>
+              <strong><%= @payment.puntopagos_params['error'] %></strong>
+            </p>
           <% end %>
 
           <h2><%= Spree.t(:puntopagos_code) %></h2>
