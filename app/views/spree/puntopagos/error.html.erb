@@ -15,11 +15,15 @@
 
           <p><%= Spree.t(:puntopagos_payment_with_errors) %></p>
 
+          <% if @payment.respond_to?(:puntopagos_params) and @payment.puntopagos_params and @payment.puntopagos_params['error'] %>
+            <p><%= @payment.puntopagos_params['error'] %></p>
+          <% end %>
+
           <h2><%= Spree.t(:puntopagos_code) %></h2>
 
           <p>
             <strong>
-              <%= @order.token %>
+              <%= @payment.token %>
             </strong>
           </p>
         </fieldset>
