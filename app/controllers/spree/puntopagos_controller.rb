@@ -16,7 +16,7 @@ module Spree
 
         capture_payment
       else
-        @payment.update_attributes puntopagos_params: message
+        @payment.update_attributes puntopagos_params: {'error' => message}
 
         unless ['processing', 'failed'].include?(@payment.state)
           @payment.started_processing!

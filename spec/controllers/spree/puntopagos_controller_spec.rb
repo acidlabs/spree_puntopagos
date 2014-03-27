@@ -199,15 +199,13 @@ describe Spree::PuntopagosController do
     context "failure response" do
       it 'should save :puntopagos_params' do
         ::PuntoPagos::Notification.any_instance.stub(:valid?).and_return(false)
-        ::PuntoPagos::Notification.any_instance.stub(:error).and_return(@failed_params)
+        ::PuntoPagos::Notification.any_instance.stub(:error).and_return(@failed_params['puntopago']['error'])
 
         post :confirmation, @failed_params
 
         assigns(:payment).puntopagos_params.should_not be_nil
-        puts assigns(:payment).puntopagos_params.inspect
-        puts @failed_params.inspect
         assigns(:payment).puntopagos_params['error'].should_not be_nil
-        assigns(:payment).puntopagos_params.should == @failed_params['puntopago']
+        assigns(:payment).puntopagos_params['error'].should == @failed_params['puntopago']['error']
       end
 
       it 'must fail the :payment' do
