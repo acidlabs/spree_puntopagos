@@ -199,7 +199,7 @@ describe Spree::PuntopagosController do
     context "failure response" do
       it 'should save :puntopagos_params' do
         ::PuntoPagos::Notification.any_instance.stub(:valid?).and_return(false)
-        ::PuntoPagos::Notification.any_instance.stub(:error).and_return(@failed_params['puntopago']['error'])
+        ::PuntoPagos::Notification.any_instance.stub(:error).and_return(@failed_params)
 
         post :confirmation, @failed_params
 
