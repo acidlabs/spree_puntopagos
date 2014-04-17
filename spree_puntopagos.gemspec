@@ -36,4 +36,5 @@ Gem::Specification.new do |s|
 
   # s.add_development_dependency 'puntopagos'
   s.add_runtime_dependency 'puntopagos'
+  s.add_runtime_dependency 'multi_logger'
 end

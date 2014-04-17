@@ -5,4 +5,7 @@ gem 'spree_auth_devise', github: 'spree/spree_auth_devise', :branch => '2-1-stab
 
 gem 'puntopagos'
 
+# MultiLogger
+gem 'multi_logger'
+
 gemspec

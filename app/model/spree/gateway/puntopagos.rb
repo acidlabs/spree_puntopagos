@@ -52,28 +52,58 @@ module Spree
       payment = Spree::Payment.find_by(identifier: payment_identifier)
       order   = payment.order
 
+      begin
+        MultiLogger.add_logger(order.number)
+      rescue Exception => e
+        Rails.logger.info("Logger #{order.number}.log already initialized")
+      end
+
+      Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Start capture method inside Spree::Gateway::Puntopagos!")
+
       if payment.puntopagos_params?
+        Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Puntopagos_params present!: #{payment.puntopagos_params.inspect}")
+
         if payment.puntopagos_params["respuesta"] == "00"
+          Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Response success!")
           ActiveMerchant::Billing::Response.new(true,  make_success_message(payment.puntopagos_params), {}, {})
         else
+          Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Response failure!")
+          Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Error: #{payment.puntopagos_params['error']}")
+
           payment.update_attributes puntopagos_params: {'error' => payment.puntopagos_params["error"]}
-          unless ['processing', 'failed'].include?(payment.state)
+          if ['processing', 'failed'].include?(payment.state)
+            Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Warning - Can't failure! Payment with state: #{payment.state}")
+          else
+            Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Failuring! Payment from state: #{payment.state}")
             payment.started_processing!
             payment.failure!
+            Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Failure! Payment to state: #{payment.state}")
           end
 
           ActiveMerchant::Billing::Response.new(false, make_failure_message(payment.puntopagos_params), {}, {})
         end
       else
+        Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Without puntopagos_params!")
+
+        Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Make Status Request...")
         status = provider.new.check_status(payment.token, payment.trx_id.to_s, order.puntopagos_amount)
 
         if status.valid?
+          Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Response success!")
           ActiveMerchant::Billing::Response.new(true, Spree.t(:puntopagos_captured), {}, {})
         else
+          Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Response failure!")
+          Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Error: #{status.error}")
+
           payment.update_attributes puntopagos_params: {'error' => status.error}
-          unless ['processing', 'failed'].include?(payment.state)
+          if ['processing', 'failed'].include?(payment.state)
+            Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Warning - Can't failure! Payment with state: #{payment.state}")
+          else
+            Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Failuring! Payment from state: #{payment.state}")
+            payment.started_processing!
             payment.started_processing!
             payment.failure!
+            Rails.logger.send(order.number).info("#{__FILE__}:#{__LINE__} Failure! Payment to state: #{payment.state}")
           end
 
           ActiveMerchant::Billing::Response.new(false, status.error, {}, {})
